@@ -1,31 +1,18 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import asyncio
-app = FastAPI()
-clients = []
-import uvicorn
+import websockets
 
-async def handle_message(websocket: WebSocket):
+async def handle_connection(websocket, path):
+    # Handle incoming messages from the client
+    async for message in websocket:
+        print(f"Received message: {message}")
 
-    global fastest_time
-    await websocket.accept()
-    clients.append(websocket)
-    try:
-        while True:
-            message = await websocket.receive_text()
-            await websocket.send_text(f"your message is {message}")
-            if message == "dis":
-                return
-    except WebSocketDisconnect:
-        pass
+        # Send a response back to the client
+        response = f"Server received: {message}"
+        await websocket.send(response)
 
-# WebSocket route
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await handle_message(websocket)
+# Start the WebSocket server
+start_server = websockets.serve(handle_connection, "localhost", 8765)
 
-@app.get("/")
-async  def hello():
-    return {"myhome"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=80)
+# Run the server indefinitely
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

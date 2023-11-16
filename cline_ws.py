@@ -1,21 +1,22 @@
 import asyncio
 import websockets
 import time
-
-# start the websocket client
-async def start_client():
-    async with websockets.connect("ws://localhost:80/ws") as websocket:
+async def connect_to_server():
+    uri = "ws://localhost:8765"
+    async with websockets.connect(uri) as websocket:
+        # Send a message to the server
         while True:
-            inp = input("Nhap vao message:")
-            if inp == "q":
+            message = input("Nhap input")
+            if message == "q":
                 break
             t = time.time()
-            await websocket.send(inp)
+            await websocket.send(message)
+            print(f"Sent message: {message}")
             print(time.time()-t)
-            message = await websocket.recv()
+            # Receive and print the server's response
+            response = await websocket.recv()
+            print(f"Received response: {response}")
             print(time.time()-t)
-            print(message)
 
-
-# run the client
-asyncio.run(start_client())
+# Run the WebSocket client
+asyncio.get_event_loop().run_until_complete(connect_to_server())
