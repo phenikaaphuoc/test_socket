@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import time
 async def connect_to_server():
-    uri = "ws://localhost:8765"
+    uri = "ws://0:8765"
     async with websockets.connect(uri) as websocket:
         # Send a message to the server
         while True:
